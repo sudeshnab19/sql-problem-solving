@@ -1,0 +1,19 @@
+/*How many Vegetarian and Meatlovers were ordered by each customer*/
+SELECT
+    c.cust_id   /*the cust_id reflects the customer id*/
+    ,n.pizza_name    /* veg and meatlover pizza*/
+    ,count(n.pizza_name)   /* needs the count of veg and meatlover pizzas*/
+FROM
+    customer_orders as c
+INNER JOIN
+    pizza_names as n
+ON
+    c.pizza_id=n.pizza_id
+GROUP BY
+    c.cust_id
+    ,n.pizza_name
+HAVING
+    n.pizza_name='veg'
+OR
+    n.pizza_name='meatlover'
+;

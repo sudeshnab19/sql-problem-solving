@@ -1,0 +1,19 @@
+SELECT
+    v.cus_id, sum(v.points) total_points
+FROM (
+SELECT  
+    s.cus_id,u.prod_name,u.price,
+CASE WHEN u.prod_name='breakfast' THEN u.price*10
+    WHEN u.prod_name='brunch' THEN u.price*20
+    END as points
+FROM
+    sales s
+INNER JOIN
+    menu u
+ON
+    s.prod_id=u.prod_id
+GROUP BY
+    s.cus_id, u.prod_name, u.price
+) v
+GROUP BY v.cus_id
+ORDER BY total_points DESC

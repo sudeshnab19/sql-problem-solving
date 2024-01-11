@@ -1,0 +1,47 @@
+SELECT
+    j.cus_id
+    ,sum(j.CASE)
+
+FROM(SELECT
+    i.cus_id
+    ,i.join_date
+    ,i.prod_name
+    ,CASE WHEN i.join_date>'2023-11-01' AND i.join_date+7>'2023-12-01' THEN i.price*20 
+    ELSE 10*i.price
+    END
+
+FROM
+(SELECT
+    c.cus_id
+    ,c.prod_name
+    ,c.order_date
+    ,c.join_date
+    ,c.join_date+7 firstweek
+    ,c.price
+    ,dense_rank() OVER (PARTITION BY c.cus_id ORDER BY c.order_date)
+
+FROM (
+SELECT
+    m.*
+    ,s.order_date
+    ,s.prod_id
+    ,u.prod_name
+    ,u.prod_id
+    ,u.price
+FROM
+    members m
+INNER JOIN
+    sales s
+ON
+    m.cus_id=s.cus_id
+INNER JOIN
+    menu u
+ON
+    u.prod_id=s.prod_id) c
+WHERE
+    c.join_date <'2023-12-01')i)j
+GROUP BY
+    j.cus_id
+
+
+

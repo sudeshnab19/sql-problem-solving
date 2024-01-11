@@ -1,0 +1,14 @@
+/*4. How many of each type of pizza was delivered?*/
+
+SELECT
+    c.pizza_id, count(c.pizza_id)
+FROM
+    runners_orders as r
+inner join
+    customer_orders as c
+on
+    r.ord_id=c.ord_id
+where   
+    r.cancellation='no'
+group by
+    c.pizza_id

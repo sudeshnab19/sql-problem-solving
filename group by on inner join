@@ -1,0 +1,21 @@
+SELECT
+    count(v.prod_name),v.prod_name,sum(v.price)
+FROM 
+(SELECT  
+    s.cus_id,s.order_date,u.prod_name,u.price
+FROM
+    sales s
+INNER JOIN
+    members m
+ON
+    s.cus_id=m.cus_id
+INNER JOIN
+    menu u
+ON
+    s.prod_id=u.prod_id
+WHERE
+    s.order_date!=m.join_date) v
+group by
+    v.prod_name
+
+

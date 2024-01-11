@@ -1,0 +1,9 @@
+SELECT
+     runner_id
+    ,count(runner_id)
+FROM
+    runners_orders
+WHERE
+    cancellation='no'
+GROUP BY
+    runner_id
