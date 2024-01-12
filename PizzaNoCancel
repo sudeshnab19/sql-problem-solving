@@ -1,0 +1,17 @@
+/*How many pizzas were delivered that had both exclusions and extras?*/
+
+SELECT
+    count(c.pizza_id)
+FROM
+    customer_orders as c
+INNER JOIN
+    runners_orders as r
+ON
+    c.ord_id=r.ord_id
+WHERE
+    r.cancellation='no' and c.exclusions='yes'
+OR
+    r.cancellation='no' and c.extras='yes'
+
+
+
