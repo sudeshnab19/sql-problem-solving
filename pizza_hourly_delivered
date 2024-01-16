@@ -1,0 +1,11 @@
+/*What was the total volume of pizzas ordered for each hour of the day?*/
+SELECT
+    EXTRACT(HOUR FROM order_date) as hour_of_day
+    ,count(pizza_id) as pizza_ordered
+FROM
+    customer_orders
+GROUP BY
+    EXTRACT(HOUR FROM order_date)
+ORDER BY
+    hour_of_day ASC
+
