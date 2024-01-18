@@ -1,0 +1,15 @@
+/*What was the volume of orders for each day of the week?*/
+
+SELECT
+    to_char(sub.day,'Day') as weekday
+    ,sub.volume_orders_weekday
+FROM(
+SELECT
+    date(order_date) as day
+    ,count(pizza_id) as volume_orders_weekday
+FROM    
+    customer_orders
+GROUP BY
+    date(order_date)
+) as sub
+
