@@ -1,0 +1,37 @@
+SELECT
+    *
+FROM
+    salary;
+SELECT
+    *
+from
+    income;
+SELECT
+    *
+from
+    deduction;
+
+
+SELECT
+    s.*,i.income as trns_type
+    ,case WHEN income='Basic' THEN round((s.base_salary*i.percentage)*.01,0)
+        when income='Allowance' then round((s.base_salary*i.percentage)*.01,0)
+        when income='Others' then   round((s.base_salary*i.percentage)*.01,0)
+        else null
+        end as amount
+from    
+    salary as s
+cross join
+    income as i
+UNION
+SELECT
+    s.*,d.deduction as trns_type
+    ,case WHEN deduction='Insurance' THEN round((s.base_salary*d.percentage)*.01,0)
+        when deduction='Health' then round((s.base_salary*d.percentage)*.01,0)
+        when deduction='House' then   round((s.base_salary*d.percentage)*.01,0)
+        else null
+        end as amount
+from    
+    salary as s
+cross join
+    deduction as d

@@ -1,0 +1,43 @@
+with cte as 
+        (SELECT
+            t.*
+            ,h.id as hut1_id
+            ,h.name as hut1_name
+            ,h.altitude as hut1_altitude
+        FROM
+            mountain_huts as h
+        INNER JOIN
+            trails as t
+        ON
+            h.id=t.hut1),       
+  cte_rn  as ( SELECT
+            cte.hut1_id
+            ,cte.hut1_name
+            ,cte.hut1_altitude
+            ,mountain_huts.id as hut2_id
+            ,mountain_huts.name as hut2_name
+            ,mountain_huts.altitude as hut2_altitude
+            ,CASE WHEN hut1_altitude > mountain_huts.altitude  
+                THEN hut1_name
+                ELSE mountain_huts.name
+                end as start_name
+            ,CASE WHEN hut1_altitude > mountain_huts.altitude  
+                THEN mountain_huts.name
+                ELSE hut1_name
+                end as mid_name
+        FROM
+            cte
+        INNER JOIN
+            mountain_huts  
+        on
+            mountain_huts.id = cte.hut2)
+select
+    c1.start_name as startpt
+    ,c1.mid_name as middlept
+    ,c2.mid_name as endpt
+from
+    cte_rn c1
+join
+    cte_rn c2
+on
+    c1.mid_name=c2.start_name

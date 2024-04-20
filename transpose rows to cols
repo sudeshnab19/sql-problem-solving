@@ -1,0 +1,34 @@
+---Building salary report
+/*
+SELECT  
+    *
+from
+    crosstab('Base query','list of columns')
+    as result(final columns with data type)
+*/
+
+
+
+SELECT  
+    employee
+    ,basic
+    ,allowance
+    ,others
+    ,(basic+allowance+others) as gross
+    ,insurance
+    ,health
+    ,house
+    ,(insurance+health+house) as total_deductions
+    ,(basic+allowance+others)-(insurance+health+house) as net_pay
+from
+    crosstab('SELECT
+    emp_name,trns_type,round(amount,0)
+    FROM
+    emp_transaction
+    order by emp_name, trns_type','SELECT
+    DISTINCT trns_type
+FROM
+    emp_transaction
+    order by trns_type')
+    as result(employee varchar, allowance numeric, basic numeric, health numeric, house numeric, insurance numeric, others numeric)
+

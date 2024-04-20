@@ -1,0 +1,29 @@
+/*SELECT
+*
+from(select
+    id
+from
+    Q4_data
+order by id desc
+limit 1) as id1
+cross join (
+select
+    name
+from
+    Q4_data
+WHERE
+    name is not NULL
+limit 1) as name1
+cross join
+(SELECT  
+    location
+from
+     Q4_data
+WHERE
+    location is not null) as loc1 */
+
+SELECT  
+    min(id) as id ,min(name) as name,min(location) as location /* min and max function works for var char and aggregate funtion ignores null value*/
+from
+    q4_data
+

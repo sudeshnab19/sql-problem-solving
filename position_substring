@@ -1,0 +1,15 @@
+--The SPLIT_PART() function splits a string on a specified delimiter and returns the nth substring.
+with cte as (
+
+SELECT  
+    address
+    ,length(address)-length(replace(address,' ','')) as no_space_address
+FROM
+    address)
+SELECT
+    *
+    ,case when cte.no_space_address <=2 then split_part(address,' ',1) else NULL end as first_name /*split_part function is only available in postgresql*/
+    ,case when cte.no_space_address <=3 then split_part(address,' ',2) else NULL end as second_name /*It takes 3 arguments- column name, delimiter, position*/
+FROM
+    cte
+    

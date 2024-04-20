@@ -1,0 +1,47 @@
+
+--1st solution of the footer problem  
+
+SELECT  
+    *
+FROM (
+        SELECT
+            car
+        from
+            footer
+        WHERE
+            car is not null
+        order by
+        id desc
+        limit 1)  as car
+
+cross join (
+
+        SELECT
+            length
+        from
+            footer
+        WHERE
+            length is not null
+        order by
+        id desc
+        limit 1 ) as length
+cross join (
+        SELECT
+            width
+        from
+            footer
+        WHERE
+            width is not null
+        order by
+        id desc
+        limit 1  ) as width
+cross join (
+        SELECT
+            height
+        from
+            footer
+        WHERE
+            height is not null
+        order by
+        id desc
+        limit 1  ) as height

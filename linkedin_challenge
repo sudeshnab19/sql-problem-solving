@@ -1,0 +1,17 @@
+with cte as (SELECT
+    ord_id
+    ,cust_id
+    ,pizza_id
+    ,order_date
+    ,to_char(order_date,'YYYY') as year
+    ,count(ord_id) over(partition by cust_id order by order_date)
+from
+    customer_orders) 
+SELECT
+    cte.cust_id
+from
+    cte
+where
+    cte.count>1
+and
+    cte.year='2023'
