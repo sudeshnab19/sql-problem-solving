@@ -1,0 +1,18 @@
+with cte as (select
+    *
+    ,lag(marks) over() as prev_test_marks /* lag shares marks for the prev test not doing any partition as no partition reqd.*/
+    ,case when marks>lag(marks) over()
+        then marks
+        else 0
+        end as compare
+from
+    student_tests) 
+SELECT
+    test_id
+    ,marks
+from
+    cte
+WHERE
+     cte.compare > 0
+or
+    test_id=100

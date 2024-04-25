@@ -1,0 +1,72 @@
+--1st approach window aggregate with sub query
+
+SELECT
+    m_query.test_id
+    ,m_query.marks
+from
+    (
+select
+    *
+    ,round(avg(marks) over(),0) as avg_marks
+from
+    student_tests) as m_query
+where
+    m_query.marks> m_query.avg_marks
+
+
+--2nd approach window aggregate with Common Table Expression (CTE)
+
+with cte as (
+
+select
+    *
+    ,round(avg(marks) over(),0) as avg_marks
+from
+    student_tests) 
+
+SELECT
+    cte.test_id
+    ,cte.marks
+from
+    cte
+where
+    cte.marks>cte.avg_marks
+
+
+--3rd approach with traditional aggregate function as no department mentioned for avg marks
+--Traditional aggregate function takes lesser time to execute and give results compared to windows aggregate function when the data is large
+
+SELECT
+    *
+from
+    student_tests
+WHERE
+    marks> (SELECT  --subquery is an inner query which can be executed on its own,no dependency on any other query
+    avg(marks) as avg
+from
+    student_tests)
+
+--4th approach using Join subquery. It is scalar subquery returns 1 row and 1 column
+
+SELECT
+    *
+from
+    student_tests as s
+join
+    (
+    select
+    round(avg(marks),0) as m
+    from
+    student_tests) as avg
+on
+    s.marks>avg.m
+
+
+
+
+
+
+
+
+
+
