@@ -1,0 +1,42 @@
+--sol 1 with lead window function as 2 values compared. But this is not best solution
+with cte as ( 
+    select 
+    *
+    ,lag(product_id) over (partition by customer_id,dates order by customer_id) as concat-- partition done based on customer id and daywise
+from 
+    orders
+    )
+SELECT
+    concat(product_id,',',concat) as products
+    ,dates
+from
+    cte
+WHERE
+    concat is not NULL
+UNION
+   SELECT
+    product_id :: text --as column product_id should be same data type
+    ,dates
+from
+    orders
+order by 
+    dates
+
+--sol 2- using string_agg function
+
+SELECT
+    dates
+    ,cast(product_id as text) as products
+from
+    orders
+UNION
+select
+    dates
+    ,string_agg(cast(product_id as text),',') as products
+from
+    orders
+GROUP by
+    dates, customer_id
+order by
+    dates, products
+

@@ -1,0 +1,30 @@
+--Approach 1- using arithmetic function to compare rows and generate the job_role
+-- used sub-query to generate the row_id with value
+select
+    *
+    ,case when row_id< (select row_id from job_skills WHERE job_role='Web Developer') then 'Data Engineer'
+    when row_id< (select row_id from job_skills WHERE job_role='Data Scientist') then 'Web Developer'
+    else 'Data Scientist'
+    end as new 
+from
+    job_skills
+
+--Approach 2- using sum window function which seregates each department as per job_role
+-- used first_value window function to get the first value of each segment
+
+with cte as (
+
+select
+    *
+    ,sum(case when job_role is null then 0 else 1 end) over (order by row_id    ) as segment
+from
+    job_skills
+)
+SELECT
+    row_id
+    ,first_value(job_role) over(PARTITION by cte.segment order by row_id) as job_role_updated
+    ,skills
+from
+    cte
+    
+    
