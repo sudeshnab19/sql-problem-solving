@@ -1,0 +1,54 @@
+
+/*
+
+create table arbitrary_values (name varchar(500));
+insert into arbitrary_values 
+values ('a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11, a12, a13, a14, a15, a16, a17, a18, a19, a20, a21');
+
+SELECT
+    *
+FROM
+    arbitrary_values
+*/
+
+with recursive cte as ( /* Base query starts and added new col iter to know the count of iteration for each rows */---step2
+    SELECT 
+        cte_val.v
+    ,   cte_val.rn
+    ,   1 as iter /* initializing iter as 1 */
+    ,   max(cte_val.rn) over() as max_rn /* max(rn) is the max. limit where the loop will break*/
+    from
+        cte_val
+    where
+        rn=1
+    UNION           /* union with recursive query */
+    SELECT          /* recursive query inner join with the below table */---step 3
+        cte_val.v
+    ,   cte_val.rn
+    ,   (iter+1) as iter 
+    ,    max(cte_val.rn) over() as max_rn
+    FROM
+        cte  /* recursive table name is used in the inner join with the transposed table */
+    inner join
+        cte_val
+    on
+        cte_val.rn between max_rn+1 and max_rn+1+iter /* condition row num will lie b/w max(row no)+1 and max(row no)+1+iter */
+    
+),
+cte_val as   /* first query to transform rows to columms */---step 1
+(select
+    unnest(string_to_array(name,',')) as v
+    ,row_number() over(order by unnest(string_to_array(name,','))) as rn
+from
+    arbitrary_values)
+
+/* Final output query */---step 4
+SELECT
+     string_agg(v,',')
+     ,iter
+from
+    cte
+group by
+    iter
+order by
+    iter 

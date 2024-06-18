@@ -1,0 +1,17 @@
+Create table match
+(
+    team1   varchar(20),
+    team2   varchar(20),
+    win     varchar(20)
+
+);
+    Insert into match values('Ind','SL','Ind');
+    Insert into match values('SL','Aus','Aus');
+    Insert into match values('SA','Eng','Eng');
+    Insert into match values('Eng','NZ','NZ');
+    Insert into match values('Aus','Ind','Ind');
+
+    SELECT
+        *
+    FROM
+        match;

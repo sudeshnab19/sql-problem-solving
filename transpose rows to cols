@@ -6,7 +6,7 @@ from
     crosstab('Base query','list of columns')
     as result(final columns with data type)
 */
-
+/* 
 
 
 SELECT  

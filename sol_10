@@ -1,0 +1,63 @@
+-- Crosstab
+/*
+SELECT  
+    *
+from
+    auto_repair
+    crosstab('Base query','list of columns')-- Base query means converting rows to columns-- List of Columns where the row to column being done
+    as result(final columns with data type)
+*/
+
+-- Base Query converting rows to columns
+    /*SELECT
+    l.value as level
+    ,v.value as velocity
+    ,count(*) --count all rows returned by query
+from
+    auto_repair as l
+join
+    auto_repair as v
+on  l.client=v.client
+    and l.auto= v.auto
+    and l.repair_date=v.repair_date
+WHERE
+    l.indicator='level'
+AND
+    v.indicator='velocity'
+group by
+    level, velocity
+order by
+    level, velocity*/
+
+-- Code starts
+SELECT
+    velocity
+    ,coalesce(good,0)
+    ,coalesce(regular,0)
+    ,coalesce(wrong,0)
+from
+    crosstab('SELECT
+    v.value as velocity
+    ,l.value as level
+    ,count(*) as value
+from
+    auto_repair as l
+join
+    auto_repair as v
+on  l.client=v.client
+    and l.auto= v.auto
+    and l.repair_date=v.repair_date
+WHERE
+    l.indicator=''level''
+AND
+    v.indicator=''velocity''
+group by
+    velocity,level
+order by
+    velocity, level','select distinct value from auto_repair WHERE indicator = ''level'' order by value')
+    as result(velocity varchar, good integer, regular integer, wrong integer)
+
+
+
+
+  

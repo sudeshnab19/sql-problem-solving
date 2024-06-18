@@ -1,0 +1,70 @@
+---- 1st approach consider flag based on win and loss of teams
+
+with cte as (SELECT
+    win as team  ----Taken from input table
+    ,case when team2=win or team1=win then 1
+    else 0
+    end as flag       ---- flag used for wins
+    ,case when team2=win or team1=win then 0
+    else 1
+    end as flag_no_of_loss ---- flag used for losses
+from
+    match
+
+union ALL --union all to keep the duplicates 
+
+SELECT
+    case when team2=win then team1
+    else team2
+    end as fail    ---- flag used for failed teams 
+    ,case when team2=win or team1=win then 0
+    else 1
+    end as flag     ---- flag used for wins 
+    ,case when team2=win or team1=win then 1
+    else 0
+    end as flag_no_of_loss  ---- flag used for losses
+from
+    match
+)
+SELECT
+    team
+    ,count(team) as matches_played
+    ,sum(flag) as no_of_wins
+    ,sum(flag_no_of_loss) as no_of_losses
+from
+    cte
+group by
+    cte.team
+
+
+
+
+-- 2nd approach consider win_flag based on team1 and team2 win
+
+with cte as (SELECT
+    team1 as team  ----Taken from input table
+    ,case when team1=win then 1
+    else 0
+    end as flag       ---- flag used for wins
+from
+    match
+
+union ALL --union all to keep the duplicates 
+
+SELECT
+    team2 as team
+    ,case when team2=win then 1
+    else 0
+    end as flag     ---- flag used for wins 
+from
+    match
+)
+SELECT
+    team
+    ,count(team) as matches_played--- how many matches played by each team
+    ,sum(flag) as no_of_wins--how many matches won by each team
+    ,count(team)-sum(flag) as no_of_losses-- subtract (total no. of matches played by each team)-(Matches won by each team)
+from
+    cte
+group by
+    cte.team
