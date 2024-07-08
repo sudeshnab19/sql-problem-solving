@@ -1,0 +1,102 @@
+/*drop table if exists batch;
+drop table if exists orders;
+
+create table batch (batch_id varchar(10), quantity integer);
+create table orders (order_number varchar(10), quantity integer);
+
+
+insert into batch values ('B1', 5);
+insert into batch values ('B2', 12);
+insert into batch values ('B3', 8);
+
+insert into orders values ('O1', 2);
+insert into orders values ('O2', 8);
+insert into orders values ('O3', 2);
+insert into orders values ('O4', 5);
+insert into orders values ('O5', 9);
+insert into orders values ('O6', 5);
+
+select * from batch;
+select * from orders; */
+with batch_cte as (
+                    SELECT
+                        *
+                        ,row_number() over( order by batch_id) as rn
+                    from (
+                    with RECURSIVE batch_o as (
+                        select                      /* base query starts*/
+                            batch_id, 
+                            1 as quantity
+                        from 
+                            batch                 /* base query ends */
+                        union ALL
+                        SELECT
+                            b.batch_id, (cte.quantity+1) as quantity /* join between base and recursive query*/
+                        from
+                            batch as b
+                        join
+                            batch_o as cte
+                        on
+                            b.batch_id=cte.batch_id
+                        and
+                            b.quantity > cte.quantity       /* the loop will break when b. quantity higher than cte. quantity */
+                    )
+                    SELECT
+                        batch_id
+                        ,1 as quantity
+                    from
+                        batch_o
+                    order by
+                        batch_id, quantity
+                    ) as bx
+),
+order_cte as (
+                    SELECT
+                        *
+                        ,row_number()  over(order by order_number) as rn
+                    from (
+                    with RECURSIVE order_s as (
+                        select                      /* base query starts*/
+                            order_number, 
+                            1 as quantity
+                        from 
+                            orders                /* base query ends */
+                        union ALL
+                        SELECT
+                            o.order_number, (cte_rn.quantity+1) as quantity /* join between base and recursive query*/
+                        from
+                            orders as o
+                        join
+                        order_s as cte_rn
+                        on
+                            o.order_number=cte_rn.order_number
+                        and
+                            o.quantity > cte_rn.quantity       /* the loop will break when b. quantity higher than cte. quantity */
+                    )
+
+                    SELECT
+                        order_number
+                        ,1 as quantity
+                    from
+                        order_s
+                    order by
+                        order_number, quantity
+                    ) as ox
+)
+
+SELECT  
+    oc.order_number
+    , bc.batch_id
+    ,sum(bc.quantity)
+from
+    order_cte as oc
+left join
+    batch_cte as bc
+on
+    oc.rn=bc.rn
+group by
+    oc.order_number
+    ,bc.batch_id
+order by
+    oc.order_number
+    ,bc.batch_id
