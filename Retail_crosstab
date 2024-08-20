@@ -1,0 +1,22 @@
+select
+    *
+from
+    store;
+
+SELECT
+    *
+from crosstab(
+'Select
+    store
+    ,week           /* 2nd column has to be transposed rows to columns */
+    ,cast(sum(sales) as numeric)    /* 3rd column has to be aggregate */
+from
+    store
+GROUP by
+    store,week
+order by
+    store, week','select DISTINCT week from store order by week'
+)
+as (store character VARYING, week_1 integer, week_2 integer)
+;
+

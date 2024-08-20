@@ -1,0 +1,15 @@
+with cte as (SELECT  
+    *
+    ,case when caller>receiver then caller else receiver end as caller_mod
+    ,case when caller<receiver then caller else receiver end as receiver_mod
+from
+    call_duration
+) 
+SELECT
+    cte.caller_mod
+    ,cte.receiver_mod
+    ,sum(cte.duration)
+from
+    cte
+GROUP by
+    cte.caller_mod, cte.receiver_mod
