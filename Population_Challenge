@@ -60,6 +60,12 @@ on
     cte_n.rn=cte_rn.rn
 
 
+/*
+select
+    *
+from
+    city_population
+*/
 
 
 

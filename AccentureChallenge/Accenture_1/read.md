@@ -1,0 +1,1 @@
+        * Find out the employee id where the email id is duplicated and in lower case

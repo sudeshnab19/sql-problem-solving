@@ -1,0 +1,28 @@
+SELECT
+    *
+from
+    city_population;
+
+with cte as (SELECT
+    *,
+    max(population) over(PARTITION by state order by population desc) as max_city,
+    min(population) over(PARTITION by state order by population asc) as min_city
+from
+    city_population
+order by
+    state),
+cte_rn as (SELECT
+    state,
+    max(case when cte.population=cte.max_city then city else null end ) as max_city,
+    min(case when cte.population=cte.min_city then city else null end) as min_city
+from
+    cte
+group by
+    state)
+
+SELECT
+    state,
+    max_city,
+    min_city
+from
+    cte_rn

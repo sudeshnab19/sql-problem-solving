@@ -1,0 +1,101 @@
+/*
+-- Use Case 1:
+drop table if exists listens;
+create table listens
+(
+	user_id 	int,
+	song_id		int,
+	day			date
+);
+drop table if exists friendship;
+create table friendship
+(
+	user1_id 	int,
+	user2_id	int
+);
+
+insert into listens values(1,10,to_date('2021-03-15','yyyy-mm-dd'));
+insert into listens values(1,11,to_date('2021-03-15','yyyy-mm-dd'));
+insert into listens values(1,12,to_date('2021-03-15','yyyy-mm-dd'));
+insert into listens values(2,10,to_date('2021-03-15','yyyy-mm-dd'));
+insert into listens values(2,11,to_date('2021-03-15','yyyy-mm-dd'));
+insert into listens values(2,12,to_date('2021-03-15','yyyy-mm-dd'));
+insert into listens values(3,10,to_date('2021-03-15','yyyy-mm-dd'));
+insert into listens values(3,11,to_date('2021-03-15','yyyy-mm-dd'));
+insert into listens values(3,12,to_date('2021-03-15','yyyy-mm-dd'));
+insert into listens values(4,10,to_date('2021-03-15','yyyy-mm-dd'));
+insert into listens values(4,11,to_date('2021-03-15','yyyy-mm-dd'));
+insert into listens values(4,13,to_date('2021-03-15','yyyy-mm-dd'));
+insert into listens values(5,10,to_date('2021-03-16','yyyy-mm-dd'));
+insert into listens values(5,11,to_date('2021-03-16','yyyy-mm-dd'));
+insert into listens values(5,12,to_date('2021-03-16','yyyy-mm-dd'));
+
+insert into friendship values(1,2);
+
+select * from listens;
+select * from friendship;
+*/
+
+with cte_r as (
+SELECT                                                 ---5th step to select the flag=1 and user_ids are not part of the friendship table 
+    user_id1,
+    user_id2,
+    comb1
+from (
+select                                                 ---4th step to use flag 0 for all the same user_id1=userid2 and concat other user_ids
+    user_id1,
+    user_id2,
+    concat(user_id1,user_id2) as comb1,
+    case when user_id1=user_id2 then 0 else 1 end as flag
+from (
+with cte_rn as(SELECT                                  --- 2nd step where count of user_id >=3 for the song_id and day repeated
+    user_id
+from (
+with cte as (SELECT                                    ---The code starts here
+    *,
+    count(user_id) over (partition by song_id, day order by song_id)
+from
+    listens
+order by
+    user_id)
+select
+    user_id,
+    count(user_id)
+from
+    cte
+where
+    count>=3
+group by
+    user_id
+) as main
+where
+    count>=3    
+)
+select                                              --- 3rd step to do cross join for all the repeated user_ids greater than 3 
+    c1.user_id as user_id1,
+    c2.user_id as user_id2
+from 
+    cte_rn as c1
+cross join
+    cte_rn as c2
+) as main2
+) as main3
+where
+    flag=1
+and
+    comb1 not in (                                 ---subpart of 5th step where friendship table is taken and found all the userids combination
+SELECT
+    concat(user1_id,user2_id) as comb2
+from
+    friendship
+union 
+SELECT
+    concat(user2_id,user1_id) as comb2
+from
+    friendship)
+)
+SELECT                                          --- 6th part of final part to select the user_ids not part of friendship tabel and count more than 3 for same song_id and day
+    user_id1 as user_id,
+    user_id2 as recommended_id
+from
+    cte_r
