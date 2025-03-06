@@ -60,9 +60,47 @@ hourly rentals and a 50% discount for daily rentals. All other bikes should
 have a 50% discount for all types of rentals.
 Round the new prices to 2 decimal digits.*/
 
+select
+    id
+    ,category
+    ,price_per_hour as old_price_per_hour
+    ,case when category='electric' then (price_per_hour*.9) 
+        when category='mountain bike' then (price_per_hour*.8) else (price_per_hour*.5)
+        end as new_price_per_hour
+    ,price_per_day as old_price_per_day
+    ,case when category='electric' then (price_per_day*.8)
+        when category='mountain bike' then (price_per_day*.5) else (price_per_day*.5)
+        end as new_price_per_day
+from
+    bike
+
 /*4. Emily is looking for counts of the rented bikes and of the available bikes in
 each category.
 Display the number of available bikes (call this column 
 available_bikes_count ) 
 and the number of rented bikes (call this column rented_bikes_count )
 by bike category. */ 
+
+with cte as (select
+    status
+    ,category
+    ,count(*)
+from
+    bike
+group by
+    category, status
+having
+    status in ('rented','available')
+)
+select
+    cte.category
+    ,case when status='available' then count else 0 end as available_bikes_count
+    ,case when status='rented' then count else 0 end as rented_bikes_count
+from
+    cte
+
+
+
+
+
+
