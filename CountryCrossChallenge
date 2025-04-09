@@ -1,0 +1,41 @@
+/*drop table if exists countries;
+create table countries
+(
+    id      int  primary KEY,
+    country varchar 
+);
+
+insert into countries values (1, 'India');
+insert into countries values (2, 'Australia');
+insert into countries values (3, 'Sri Lanka');
+*/
+
+select
+    *
+from
+    countries;
+
+with cte as (SELECT
+    c1.country as team_1,
+    c2.country as team_2,
+    case when  c1.country=c2.country then 0 else 1 end as flag
+from
+    countries as c1
+cross join
+    countries as c2
+),
+cte_rn as (SELECT
+    case when team_1>team_2 then team_1 else team_2 end as team_1,
+    case when team_1<team_2 then team_1 else team_2 end as team_2
+from
+    cte
+where
+    cte.flag=1
+)
+SELECT
+    team_1,
+    team_2
+from
+    cte_rn
+group by
+    team_1, team_2

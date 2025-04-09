@@ -99,8 +99,38 @@ select
 from
     cte
 
+/* Emily is preparing a sales report. She needs to know the total revenue
+from rentals by month, the total by year, and the all-time across all the
+years.Display the total revenue from rentals for each month, the total for each
+year, and the total across all the years. 
+Do not take memberships into account. 
+There should be 3 columns: year , month , and revenue.
+Sort the results chronologically. Display the year total after all the month
+totals for the corresponding year. Show the all-time total as the last row.
+*/
 
-
-
-
-
+with cte as (select
+    extract(year from start_timestamp) as year
+    ,extract (month from start_timestamp) as month
+    ,extract (day from start_timestamp) as day
+    ,duration
+    ,total_paid
+from
+    rental
+),
+cte_n as (select
+    sum(total_paid) over (partition by month, year order by month, year) as revenue
+    ,cte.year
+    ,cte.month
+from
+    cte
+)
+select
+    revenue
+    ,year
+    ,month
+from
+    cte_n
+group by
+    year
+    ,month
