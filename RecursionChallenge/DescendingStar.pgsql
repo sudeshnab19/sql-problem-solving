@@ -1,5 +1,5 @@
 
-/* Print stars in descending order from 10 to 1 */
+/* Print stars in descending order from 20 to 1 */
 
 
 with recursive cte_rec as (
