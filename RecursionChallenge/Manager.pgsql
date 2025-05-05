@@ -52,6 +52,46 @@ on
     cte_rn.id=emp_details.manager_id
     )
 SELECT
-    *
+    cte_rn.*
+    ,emp_details.name as manager_name
 from
-    cte_rn;
+    cte_rn
+inner JOIN
+    emp_details
+on
+    emp_details.id=cte_rn.manager_id;
+
+-- Find out the hierarchy of Managers for David
+
+with recursive cte_rn as (
+SELECT                          -- Base query
+    id,
+    name,
+    manager_id, 
+    1 as lvl
+from
+    emp_details
+WHERE
+    name='David'
+union
+SELECT                         -- Recursive query
+    emp_details.id,            -- columns are coming from Base table
+    emp_details.name, 
+    emp_details.manager_id, 
+    cte_rn.lvl +1 as lvl       -- iteration is for recursive table
+from
+    cte_rn 
+inner JOIN
+    emp_details
+on
+    cte_rn.manager_id=emp_details.id
+    )
+SELECT
+    cte_rn.*
+    ,emp_details.name as manager_name
+from
+    cte_rn
+inner JOIN
+    emp_details
+on
+    emp_details.id=cte_rn.manager_id;
