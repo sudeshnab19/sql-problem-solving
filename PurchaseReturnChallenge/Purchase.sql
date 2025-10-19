@@ -36,21 +36,34 @@ order by
 )
 ,cte_new as (select
     *
-    ,case when return_date<=new_date then 'successful return' else 'not successful return' end as Flag
+    ,case when return_date<=new_date then 'return' else 'successful' end as Flag
 from
     cte
 )
 , cte_new1 as (select
     *
-    ,case when return_date is null and flag = 'not successful return' then 0 else 1 end as elimination
+    ,case when return_date is null and flag = 'successful' then 0 else 1 end as elimination
 from
     cte_new
 )
 select
-    customer_id
+    customer_id,
+    count(customer_id)
 from    
     cte_new1
 where
-    elimination=1 
-and
-    flag='not successful return'
+    elimination=0
+or
+    flag='successful'
+group by
+    customer_id
+
+/*
+select customer_id
+from purchasesreturn
+where purchase_date > cast(current_date - interval '1 month' as date)
+and (return_date is null 
+    or return_date > cast(purchase_date + interval '1 week' as date))
+group by customer_id
+having count(customer_id) > 1
+*/

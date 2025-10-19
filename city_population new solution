@@ -1,0 +1,28 @@
+with cte as (SELECt
+    *
+    ,case when population = max(population) over(PARTITION by state order by population desc) then 1 end as max_city_flag
+    ,case when population = min(population) over(PARTITION by state order by population asc) then 1 end as min_city_flag
+from    
+    city_population
+),
+cte_rn as (SELECT
+    *,
+    case when max_city_flag=1 then city else 'No' end as max_city,
+    case when min_city_flag =1 then city else 'No' end as min_city
+from    
+    cte
+)
+SELECT
+    cte_rn.state,
+    cte_rn.max_city,
+    new.min_city
+from
+    cte_rn
+join                --horizontal column required so self join
+    cte_rn as new
+on
+    cte_rn.state=new.state
+WHERE
+    cte_rn.max_city_flag=1
+and
+    new.min_city_flag=1
